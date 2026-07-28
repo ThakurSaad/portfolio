@@ -6,12 +6,12 @@ export default function ThemeToggle() {
   const [dark, setDark] = useState(
     () =>
       typeof window !== "undefined" &&
-      document.documentElement.classList.contains("dark"),
+      document.documentElement.getAttribute("data-theme") === "dark",
   );
 
   function toggle() {
     const next = !dark;
-    document.documentElement.classList.toggle("dark", next);
+    document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
     localStorage.setItem("theme", next ? "dark" : "light");
     setDark(next);
   }
