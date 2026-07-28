@@ -1,4 +1,5 @@
 ﻿import { Search, HelpCircle, Settings } from "lucide-react";
+import ThemeToggle from "../theme-toggle";
 
 export default function Topbar() {
   return (
@@ -43,7 +44,7 @@ export default function Topbar() {
         >
           <Settings size={20} className="text-muted-foreground" />
         </button>
-        {/* theme toggle — client island in step 4 */}
+        <ThemeToggle />
         <div className="w-10 h-10" />
         {/* avatar */}
         <div className="w-8 h-8 rounded-full bg-[#1a73e8] flex items-center justify-center text-white text-sm font-medium ml-1">

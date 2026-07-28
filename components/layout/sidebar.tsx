@@ -24,7 +24,9 @@ export default function Sidebar() {
       <div className="px-2 mb-2">
         <button className="flex items-center gap-3 px-4 py-4 rounded-2xl bg-[var(--gmail-compose-bg)] hover:shadow-md transition-shadow">
           <PencilLine size={20} />
-          <span className="text-sm font-medium text-[#001d35] dark:text-[var(--gmail-blue-dark)]">Compose</span>
+          <span className="text-sm font-medium text-[#001d35] dark:text-[var(--gmail-blue-dark)]">
+            Compose
+          </span>
         </button>
       </div>
 
