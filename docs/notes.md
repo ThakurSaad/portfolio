@@ -1,0 +1,1 @@
+1. Make the features like this: when you first go to the Gmail inbox, there is a new tag, and the button is bold. When you navigate from another tab, the new goes out, and the bold stays, but the bold only disappears after you click and go inside that and open that Gmail. I also need this later.
