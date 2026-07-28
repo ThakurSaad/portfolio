@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { label: "Primary", href: "/", icon: Inbox },
+  { label: "Inbox", href: "/", icon: Inbox },
   { label: "Starred", href: "#", icon: Star },
   { label: "Important", href: "/important", icon: AlertCircle },
   { label: "Sent", href: "#", icon: Send },
