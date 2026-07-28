@@ -9,7 +9,7 @@ export default function Topbar() {
         {/* hamburger — client island in step 4 */}
         <div className="w-10 h-10" />
         <span className="text-xl font-medium text-[#1a73e8] ml-1">
-          Portfolio
+          Gmail
         </span>
       </div>
 
