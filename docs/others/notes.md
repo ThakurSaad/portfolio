@@ -1,1 +1,2 @@
 1. Make the features like this: when you first go to the Gmail inbox, there is a new tag, and the button is bold. When you navigate from another tab, the new goes out, and the bold stays, but the bold only disappears after you click and go inside that and open that Gmail. I also need this later.
+2. I will also add the projects that I have worked with the backend, that I have collaborated on the backend, and that I have managed as a project lead and as a project manager. This will be the categories. This is also for later. 
