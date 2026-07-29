@@ -1,4 +1,5 @@
-﻿import Sidebar from "@/components/layout/sidebar";
+﻿import MobileSidebarToggle from "@/components/layout/mobile-sidebar-toggle";
+import Sidebar from "@/components/layout/sidebar";
 import Topbar from "@/components/layout/topbar";
 
 export default function InboxLayout({
@@ -8,9 +9,17 @@ export default function InboxLayout({
 }) {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      <Sidebar />
+      <div className="hidden md:flex">
+        <Sidebar />
+      </div>
       <div className="flex flex-col flex-1 min-w-0">
-        <Topbar />
+        <Topbar
+          hamburger={
+            <MobileSidebarToggle>
+              <Sidebar />
+            </MobileSidebarToggle>
+          }
+        />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
