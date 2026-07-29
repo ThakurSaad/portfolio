@@ -94,9 +94,9 @@ export const emails: Email[] = [
     "id": "django-blog-platform",
     "sender": "Personal Project",
     "subject": "Markdown Blog Engine",
-    "snippet": "A full-featured blogging platform supporting markdown rendering and Postgres search",
+    "snippet": "A full-featured blogging platform supporting markdown rendering and Postgresql search",
     "date": "Jun 14",
-    "labels": ["python", "django", "postgres"],
+    "labels": ["python", "django", "postgresql"],
     "starred": true,
     "read": false,
     "body": [{ "type": "paragraph", "text": "Placeholder — full case study in M3." }]
@@ -129,7 +129,7 @@ export const emails: Email[] = [
     "subject": "Real-time Chat Interface",
     "snippet": "Lightweight, reactive chat application built with Svelte and WebSockets",
     "date": "Aug 09",
-    "labels": ["svelte", "websockets", "nodejs"],
+    "labels": ["svelte", "websockets", "node"],
     "starred": true,
     "read": false,
     "body": [{ "type": "paragraph", "text": "Placeholder — full case study in M3." }]
@@ -173,7 +173,7 @@ export const emails: Email[] = [
     "subject": "Image Thumbnail Generator",
     "snippet": "Event-driven AWS Lambda function that resizes images upon S3 bucket upload",
     "date": "Oct 14",
-    "labels": ["aws", "lambda", "nodejs"],
+    "labels": ["aws", "lambda", "node"],
     "starred": true,
     "read": false,
     "body": [{ "type": "paragraph", "text": "Placeholder — full case study in M3." }]

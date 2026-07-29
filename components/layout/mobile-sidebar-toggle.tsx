@@ -32,6 +32,13 @@ export default function MobileSidebarToggle({
             ${open ? "translate-x-0" : "-translate-x-full"}`}
           onClick={(e) => e.stopPropagation()}
         >
+          <button
+            aria-label="Close menu"
+            onClick={() => setOpen(false)}
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[var(--gmail-sidebar-hover)] m-1"
+          >
+            <X size={20} />
+          </button>
           {children}
         </aside>
       </div>
