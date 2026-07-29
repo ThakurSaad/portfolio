@@ -1,16 +1,14 @@
 ﻿import { Search, HelpCircle, Settings } from "lucide-react";
 import ThemeToggle from "../theme-toggle";
 
-export default function Topbar() {
+export default function Topbar({ hamburger }: { hamburger?: React.ReactNode }) {
   return (
     <header className="h-16 shrink-0 flex items-center gap-2 px-2 border-b border-border">
       {/* Left zone */}
       <div className="flex items-center gap-1 w-[256px] shrink-0">
-        {/* hamburger — client island in step 4 */}
-        <div className="w-10 h-10" />
-        <span className="text-xl font-medium text-[#1a73e8] ml-1">
-          Gmail
-        </span>
+        <div className="md:hidden">{hamburger}</div>
+        <div className="hidden md:block w-10 h-10" />
+        <span className="text-xl font-medium text-[#1a73e8] ml-1">Gmail</span>
       </div>
 
       {/* Search */}
