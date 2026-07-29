@@ -1,0 +1,128 @@
+# Progress — Gmail Portfolio
+
+Living status doc. Authoritative plan lives in `C:\Users\thakursaad\Downloads\mds\kickoff-prompt.md`
+and `concept.md`. This file only tracks *where we are*.
+
+**Last updated:** 2026-07-29 (end of M1 step 4)
+
+---
+
+## Stack as actually installed
+
+| Thing | Version / choice |
+|---|---|
+| Next.js | 16.2.12, App Router, Turbopack (now the default bundler) |
+| React | 19.2.4 |
+| TypeScript | 5.9.3, `strict` + `noUncheckedIndexedAccess` |
+| Tailwind | 4.3.3 — **CSS-first, there is no `tailwind.config.js`** |
+| shadcn/ui | CLI 4.15.0, primitives are **Base UI** (`@base-ui/react`), not Radix |
+| Package manager | pnpm 11.13.0 |
+| Fonts | Inter (chrome) + Roboto (body) + Roboto Mono, via `next/font/google` |
+
+Quality gates: `pnpm typecheck`, `pnpm lint`, `pnpm build` — all pass.
+`/` and `/_not-found` both prerender as `○ (Static)`.
+
+---
+
+## Milestones
+
+- [x] **M0** — scaffold, git init, shadcn, Gmail palette tokens, light/dark, fonts
+- [~] **M1** — the shell
+  - [x] Step 1 — `app/(inbox)/` route group + chrome layout
+  - [x] Step 2 — sidebar (Compose, nav items, Labels section stub)
+  - [x] Step 3 — topbar (search form, help/settings, avatar stub)
+  - [x] Step 4 — theme toggle (client component #1)
+  - [ ] Step 5 — mobile hamburger toggle (client component #2) ← **NEXT**
+- [ ] **M2** — `Email` type, `content/`, inbox list rendering
+- [ ] **M3** — reading view, block renderer, signature
+- [ ] **M4** — label filtering
+- [ ] **M5** — responsive, a11y, SEO, deploy to Vercel
+- [ ] **M6** — remaining Tier 1 content → frontend complete
+- [ ] M7 compose→backend · M8 chat · M9 owner inbox *(no backend work before M7)*
+
+## Client component budget: **1 of 8 used**
+
+1. `components/theme-toggle.tsx` — needs `onClick`; holds zero state.
+
+---
+
+## Files that exist
+
+```
+app/
+  layout.tsx              root layout — fonts, metadata, anti-flash theme script
+  globals.css             Tailwind v4 @theme + Gmail palette tokens
+  (inbox)/
+    layout.tsx            Gmail chrome: sidebar + topbar + scrolling <main>
+    page.tsx              placeholder, "Inbox coming in M2"
+components/
+  layout/sidebar.tsx
+  layout/topbar.tsx
+  theme-toggle.tsx        client component #1
+  ui/button.tsx           shadcn, untouched
+lib/utils.ts              shadcn cn()
+```
+
+---
+
+## Decisions made along the way
+
+**Theming is `data-theme`, not a `.dark` class.** `@custom-variant dark (&:is([data-theme="dark"] *))`
+in `globals.css`, and the values live under `[data-theme="dark"] { }`.
+
+**Why:** the toggle originally used `useState` with a lazy initializer that read the DOM.
+Server rendered one icon, client rendered the other → hydration mismatch → React discarded
+the server HTML and re-rendered from the RSC payload, wiping the inline script's work on
+`<html>`. Fix was to make the toggle **stateless**: render both icons, let CSS
+(`dark:hidden` / `hidden dark:block`) pick the visible one, so server and client output are
+identical. General rule: *anything differing between server and client must be resolved by
+CSS or an inline script, never by React state during initial render.*
+
+**No OS-preference fallback.** Defaults to light until the visitor clicks the toggle.
+Safe to re-add now that the hydration bug is gone (one line in the inline script in
+`app/layout.tsx`) — deliberately dropped, not broken.
+
+**Sidebar says "Inbox", not "Primary".** Per `concept.md`, Primary/Social/Promotions/Updates/
+Forums are horizontal *tabs inside* the inbox pane, not sidebar entries. Those tabs get built
+in M2 inside `app/(inbox)/page.tsx`.
+
+---
+
+## Open questions / deferred, with the milestone they land in
+
+**M4 — `searchParams` vs path routing.** The kickoff says filtering reads `searchParams`,
+but Next 16 docs are explicit: `searchParams` is a request-time API and *opts the page into
+dynamic rendering*. That contradicts "every page statically rendered at build time".
+Alternative that preserves the whole intent (URL owns state, shareable, zero client JS):
+path segments — `app/label/[slug]/page.tsx` + `generateStaticParams()`, one prerendered HTML
+file per label. Tradeoff: query params compose for multiple simultaneous filters, path
+segments don't. **Not yet decided.**
+
+**M4 — sidebar active-label highlight.** `layout.tsx` receives `params` but **never**
+`searchParams`, and layouts don't re-render on navigation. The sidebar lives in the layout
+and needs to know the active label. Options all cost something (`useSelectedLayoutSegment`
+in a small client component, or restructuring). **Not yet decided.**
+
+**Unscheduled — right-edge app-switcher rail.** Real Gmail has a slim vertical icon strip on
+the far right (Calendar, Keep, Contacts). Contacts→About Me is Tier 1, so this is structural,
+not decorative. Discussed, deliberately deferred until we know which icons it needs.
+
+**Before deploy:**
+- `metadata.description` in `app/layout.tsx` still says "Generated by create next app"
+- Topbar wordmark currently reads "Gmail" — kickoff forbids Google branding, needs own mark
+- `--gmail-blue-dark` / `--gmail-selected-dark` in `:root` are light-mode-only helper tokens
+  with no dark counterpart; naming should be made consistent when they're first used
+
+**Consent gates (do not ship without confirming these conversations happened):**
+- Trash easter eggs quoting family/friends — exact wording OK'd, or rewritten as own memory
+- Named references — colleagues must agree before appearing, even name-only
+
+---
+
+## How to work on this
+
+From the kickoff, unchanged: **explain the concept → show a ≤15-line snippet → say which file →
+stop and wait for the user to write it → then review bluntly.** Do not write application code
+into files unless asked. Shell commands, reads, builds, linters, doc lookups are all free.
+
+One step at a time. Check current docs before running CLI commands — versions drift.
