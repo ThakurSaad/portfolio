@@ -1,7 +1,7 @@
 # Progress — Gmail Portfolio
 
 Living status doc. Authoritative plan lives in `C:\Users\thakursaad\Downloads\mds\kickoff-prompt.md`
-and `concept.md`. This file only tracks *where we are*.
+and `concept.md`. This file only tracks _where we are_.
 
 **Last updated:** 2026-07-29 (M2 done, starting M3)
 
@@ -9,15 +9,15 @@ and `concept.md`. This file only tracks *where we are*.
 
 ## Stack as actually installed
 
-| Thing | Version / choice |
-|---|---|
-| Next.js | 16.2.12, App Router, Turbopack (now the default bundler) |
-| React | 19.2.4 |
-| TypeScript | 5.9.3, `strict` + `noUncheckedIndexedAccess` |
-| Tailwind | 4.3.3 — **CSS-first, there is no `tailwind.config.js`** |
-| shadcn/ui | CLI 4.15.0, primitives are **Base UI** (`@base-ui/react`), not Radix |
-| Package manager | pnpm 11.13.0 |
-| Fonts | Inter (chrome) + Roboto (body) + Roboto Mono, via `next/font/google` |
+| Thing           | Version / choice                                                     |
+| --------------- | -------------------------------------------------------------------- |
+| Next.js         | 16.2.12, App Router, Turbopack (now the default bundler)             |
+| React           | 19.2.4                                                               |
+| TypeScript      | 5.9.3, `strict` + `noUncheckedIndexedAccess`                         |
+| Tailwind        | 4.3.3 — **CSS-first, there is no `tailwind.config.js`**              |
+| shadcn/ui       | CLI 4.15.0, primitives are **Base UI** (`@base-ui/react`), not Radix |
+| Package manager | pnpm 11.13.0                                                         |
+| Fonts           | Inter (chrome) + Roboto (body) + Roboto Mono, via `next/font/google` |
 
 Quality gates: `pnpm typecheck`, `pnpm lint`, `pnpm build` — all pass.
 `/` and `/_not-found` both prerender as `○ (Static)`.
@@ -40,7 +40,7 @@ Quality gates: `pnpm typecheck`, `pnpm lint`, `pnpm build` — all pass.
 - [ ] **M4** — label filtering
 - [ ] **M5** — responsive, a11y, SEO, deploy to Vercel
 - [ ] **M6** — remaining Tier 1 content → frontend complete
-- [ ] M7 compose→backend · M8 chat · M9 owner inbox *(no backend work before M7)*
+- [ ] M7 compose→backend · M8 chat · M9 owner inbox _(no backend work before M7)_
 
 ## Client component budget: **2 of 8 used**
 
@@ -79,15 +79,15 @@ Server rendered one icon, client rendered the other → hydration mismatch → R
 the server HTML and re-rendered from the RSC payload, wiping the inline script's work on
 `<html>`. Fix was to make the toggle **stateless**: render both icons, let CSS
 (`dark:hidden` / `hidden dark:block`) pick the visible one, so server and client output are
-identical. General rule: *anything differing between server and client must be resolved by
-CSS or an inline script, never by React state during initial render.*
+identical. General rule: _anything differing between server and client must be resolved by
+CSS or an inline script, never by React state during initial render._
 
 **No OS-preference fallback.** Defaults to light until the visitor clicks the toggle.
 Safe to re-add now that the hydration bug is gone (one line in the inline script in
 `app/layout.tsx`) — deliberately dropped, not broken.
 
 **Sidebar says "Inbox", not "Primary".** Per `concept.md`, Primary/Social/Promotions/Updates/
-Forums are horizontal *tabs inside* the inbox pane, not sidebar entries. Those tabs get built
+Forums are horizontal _tabs inside_ the inbox pane, not sidebar entries. Those tabs get built
 in M2 inside `app/(inbox)/page.tsx`.
 
 ---
@@ -95,8 +95,8 @@ in M2 inside `app/(inbox)/page.tsx`.
 ## Open questions / deferred, with the milestone they land in
 
 **M4 — `searchParams` vs path routing.** The kickoff says filtering reads `searchParams`,
-but Next 16 docs are explicit: `searchParams` is a request-time API and *opts the page into
-dynamic rendering*. That contradicts "every page statically rendered at build time".
+but Next 16 docs are explicit: `searchParams` is a request-time API and _opts the page into
+dynamic rendering_. That contradicts "every page statically rendered at build time".
 Alternative that preserves the whole intent (URL owns state, shareable, zero client JS):
 path segments — `app/label/[slug]/page.tsx` + `generateStaticParams()`, one prerendered HTML
 file per label. Tradeoff: query params compose for multiple simultaneous filters, path
@@ -112,7 +112,7 @@ the far right (Calendar, Keep, Contacts). Contacts→About Me is Tier 1, so this
 not decorative. Discussed, deliberately deferred until we know which icons it needs.
 
 **Mobile drawer slide animation — needs real-browser check.** The toggle logic works
-(open/close state + class flip verified). The slide *animation* could not be verified in the
+(open/close state + class flip verified). The slide _animation_ could not be verified in the
 automation browser: it doesn't composite frames (screenshots also fail), and CSS transitions
 are driven by the paint loop, so any transition freezes at its start value there. The idiomatic
 code (`translate-x-0`/`-translate-x-full` + `transition-transform`) is almost certainly correct;
@@ -120,16 +120,19 @@ confirm the slide in a real browser at M5. If it genuinely doesn't slide, fall b
 @keyframes animation or accept a snap (remove `transition-transform`).
 
 **Inbox-list polish (fold into M3 verification):**
+
 - `sender` mixes "who" (Client Work) and "what" (Personal Project) — voice decision, not a bug
 - Subject + snippet both `flex-1` split 50/50; real Gmail weights them differently
 
 **Before deploy:**
+
 - `metadata.description` in `app/layout.tsx` still says "Generated by create next app"
 - Topbar wordmark currently reads "Gmail" — kickoff forbids Google branding, needs own mark
 - `--gmail-blue-dark` / `--gmail-selected-dark` in `:root` are light-mode-only helper tokens
   with no dark counterpart; naming should be made consistent when they're first used
 
 **Consent gates (do not ship without confirming these conversations happened):**
+
 - Trash easter eggs quoting family/friends — exact wording OK'd, or rewritten as own memory
 - Named references — colleagues must agree before appearing, even name-only
 
