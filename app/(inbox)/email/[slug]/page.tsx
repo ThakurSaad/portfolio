@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { emails } from "@/content/email";
 import { BlockContent } from "@/components/email/block-renderer";
 import { Star } from "lucide-react";
+import { Signature } from "@/components/email/signature";
 
 export const dynamicParams = false;
 
@@ -35,6 +36,7 @@ export default async function EmailPage({
       {email.body.map((block, i) => (
         <BlockContent key={i} block={block} />
       ))}
+      <Signature />
     </article>
   );
 }
