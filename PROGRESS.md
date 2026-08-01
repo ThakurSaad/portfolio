@@ -1,26 +1,26 @@
 # Progress — Gmail Portfolio
 
-Living status doc. Authoritative plan lives in `C:\Users\thakursaad\Downloads\mds\kickoff-prompt.md`
-and `concept.md`. This file only tracks _where we are_.
+Living status doc. The brief lives in `docs/instructions/kickoff-prompt.md`
+(revision 2) and `docs/instructions/concept.md`. This file tracks _where we are_.
 
-**Last updated:** 2026-07-29 (M2 done, starting M3)
+**Last updated:** 2026-08-01 — M3 done + full Gmail design pass. **M4 is next.**
 
 ---
 
 ## Stack as actually installed
 
-| Thing           | Version / choice                                                     |
-| --------------- | -------------------------------------------------------------------- |
-| Next.js         | 16.2.12, App Router, Turbopack (now the default bundler)             |
-| React           | 19.2.4                                                               |
-| TypeScript      | 5.9.3, `strict` + `noUncheckedIndexedAccess`                         |
-| Tailwind        | 4.3.3 — **CSS-first, there is no `tailwind.config.js`**              |
-| shadcn/ui       | CLI 4.15.0, primitives are **Base UI** (`@base-ui/react`), not Radix |
-| Package manager | pnpm 11.13.0                                                         |
-| Fonts           | Inter (chrome) + Roboto (body) + Roboto Mono, via `next/font/google` |
+| Thing           | Version / choice                                                      |
+| --------------- | --------------------------------------------------------------------- |
+| Next.js         | 16.2.12, App Router, Turbopack (now the default bundler)              |
+| React           | 19.2.4                                                                |
+| TypeScript      | 5.9.3, `strict` + `noUncheckedIndexedAccess`                          |
+| Tailwind        | 4.3.3 — **CSS-first, there is no `tailwind.config.js`**               |
+| shadcn/ui       | CLI 4.15.0, primitives are **Base UI** (`@base-ui/react`), not Radix  |
+| Package manager | pnpm 11.13.0                                                          |
+| Fonts           | Inter (chrome) + Roboto 400/500 + Roboto Mono, via `next/font/google` |
 
 Quality gates: `pnpm typecheck`, `pnpm lint`, `pnpm build` — all pass.
-`/` and `/_not-found` both prerender as `○ (Static)`.
+`/` and `/_not-found` prerender `○ (Static)`; `/email/[slug]` prerenders 31 pages `● (SSG)`.
 
 ---
 
@@ -29,15 +29,11 @@ Quality gates: `pnpm typecheck`, `pnpm lint`, `pnpm build` — all pass.
 - [x] **M0** — scaffold, git init, shadcn, Gmail palette tokens, light/dark, fonts
 - [x] **M1** — the shell: route group, chrome layout, sidebar, topbar, theme toggle
       (client #1), mobile drawer (client #2)
-- [x] **M2** — `Email`/`Block`/`Label` types in `content/types.ts`, 31 seed emails in
-      `content/email.ts`, inbox list rendering in `app/(inbox)/page.tsx`
-- [ ] **M3** — reading view ← **IN PROGRESS**
-  - [ ] Step 1 — `app/(inbox)/email/[slug]/page.tsx` + `generateStaticParams` (rows currently 404)
-  - [ ] Step 2 — block renderer: discriminated-union switch with exhaustiveness check
-  - [ ] Step 3 — reading-view header (sender, subject, date, labels, star) + body
-  - [ ] Step 4 — signature component
-  - [ ] Step 5 — write ONE complete real case study (replace placeholder bodies)
-- [ ] **M4** — label filtering
+- [x] **M2** — `Email`/`Block`/`Label` types, 31 seed emails, inbox list rendering
+- [x] **M3** — reading view: `[slug]` route + `generateStaticParams`, block renderer
+      with exhaustiveness check, reading-view header, signature, one written case study
+- [x] **Design pass** — full Gmail-fidelity refactor (see below)
+- [ ] **M4** — labels → URL-based filtering ← **NEXT**
 - [ ] **M5** — responsive, a11y, SEO, deploy to Vercel
 - [ ] **M6** — remaining Tier 1 content → frontend complete
 - [ ] M7 compose→backend · M8 chat · M9 owner inbox _(no backend work before M7)_
@@ -48,100 +44,132 @@ Quality gates: `pnpm typecheck`, `pnpm lint`, `pnpm build` — all pass.
 2. `components/layout/mobile-sidebar-toggle.tsx` — holds `open` boolean; receives the
    server-rendered `<Sidebar/>` as children (correct island pattern).
 
+Everything else — inbox tabs, toolbars, checkboxes, hover states — is a Server Component.
+Tabs are links, checkboxes are native inputs, hover is pure CSS.
+
 ---
 
 ## Files that exist
 
 ```
 app/
-  layout.tsx              root layout — fonts, metadata, anti-flash theme script
-  globals.css             Tailwind v4 @theme + Gmail palette tokens
+  layout.tsx                        root layout — fonts, metadata, anti-flash theme script
+  globals.css                       Tailwind v4 @theme + Gmail tokens (light + dark)
   (inbox)/
-    layout.tsx            Gmail chrome: sidebar + topbar + scrolling <main>
-    page.tsx              placeholder, "Inbox coming in M2"
+    layout.tsx                      full-width topbar, then sidebar + white card <main>
+    page.tsx                        toolbar + tabs + sorted row list
+    email/[slug]/page.tsx           reading view; generateStaticParams, dynamicParams=false
 components/
-  layout/sidebar.tsx
-  layout/topbar.tsx
-  theme-toggle.tsx        client component #1
-  ui/button.tsx           shadcn, untouched
-lib/utils.ts              shadcn cn()
+  layout/sidebar.tsx                Compose, nav rows (32px pills), unread counts
+  layout/topbar.tsx                 hamburger, wordmark, search form, apps grid, avatar
+  layout/mobile-sidebar-toggle.tsx  client #2
+  theme-toggle.tsx                  client #1
+  inbox/inbox-tabs.tsx              Primary / Promotions / Social
+  inbox/list-toolbar.tsx            select-all, refresh, pagination
+  inbox/email-row.tsx               checkbox, star, sender, subject+snippet, <time>
+  email/block-renderer.tsx          discriminated-union switch + never check
+  email/reading-toolbar.tsx         back, archive, delete, …, print
+  email/signature.tsx               reusable sign-off
+  ui/button.tsx                     shadcn, untouched
+content/
+  types.ts                          Block, Label, IsoDate, Email
+  email.ts                          31 emails (1 written, 30 filler)
+lib/
+  emails.ts                         sortedEmails + formatEmailDate
+  utils.ts                          shadcn cn()
+public/hello.jpg                    case-study image
 ```
 
 ---
 
 ## Decisions made along the way
 
-**Theming is `data-theme`, not a `.dark` class.** `@custom-variant dark (&:is([data-theme="dark"] *))`
-in `globals.css`, and the values live under `[data-theme="dark"] { }`.
+**Theming is `data-theme`, not a `.dark` class.** See kickoff rev 2 for the full
+hydration-mismatch story. Rule: _anything differing between server and client must be
+resolved by CSS or an inline script, never by React state during initial render._
 
-**Why:** the toggle originally used `useState` with a lazy initializer that read the DOM.
-Server rendered one icon, client rendered the other → hydration mismatch → React discarded
-the server HTML and re-rendered from the RSC payload, wiping the inline script's work on
-`<html>`. Fix was to make the toggle **stateless**: render both icons, let CSS
-(`dark:hidden` / `hidden dark:block`) pick the visible one, so server and client output are
-identical. General rule: _anything differing between server and client must be resolved by
-CSS or an inline script, never by React state during initial render._
+**No OS-preference fallback.** Defaults to light until the visitor clicks. Safe to re-add
+(one line in the inline script in `app/layout.tsx`) — deliberately dropped, not broken.
 
-**No OS-preference fallback.** Defaults to light until the visitor clicks the toggle.
-Safe to re-add now that the hydration bug is gone (one line in the inline script in
-`app/layout.tsx`) — deliberately dropped, not broken.
+**Sidebar says "Inbox", not "Primary".** Primary/Promotions/Social are _tabs inside_ the
+inbox pane, per `concept.md`. Built in `components/inbox/inbox-tabs.tsx`.
 
-**Sidebar says "Inbox", not "Primary".** Per `concept.md`, Primary/Social/Promotions/Updates/
-Forums are horizontal _tabs inside_ the inbox pane, not sidebar entries. Those tabs get built
-in M2 inside `app/(inbox)/page.tsx`.
+**Layout shape matches real Gmail:** the topbar spans the **full width** at the top and the
+sidebar starts _below_ it (verified: header at `top:0` full width, sidebar at `top:64`).
+The list/reading view floats as a **white rounded card** (`--gmail-card`, 16px radius) on the
+`#f6f8fc` app background — the post-2022 Material 3 Gmail look.
+
+**Dates are ISO + a template literal type.** `` IsoDate = `${number}-${number}-${number}` ``
+makes `"Jul 20"` a compile error (verified by deliberately reintroducing it). `lib/emails.ts`
+sorts reverse-chronologically — ISO sorts correctly as plain text. Rendered in
+`<time dateTime>`; shows `"Jul 20"` this year, `"Jan 12, 2025"` for older.
+
+**Never `font-bold`.** `next/font` loads Roboto **400 and 500 only**, so 700 gets synthesized
+into a smeared fake bold. Gmail uses 500 for unread — use `font-medium`.
+
+**One semantic `--gmail-accent` token** replaces the old `--gmail-blue` / `--gmail-blue-dark`
+pair, so components never need a `dark:` variant for the accent colour.
 
 ---
 
-## Open questions / deferred, with the milestone they land in
+## Open questions / deferred
 
-**M4 — `searchParams` vs path routing.** The kickoff says filtering reads `searchParams`,
-but Next 16 docs are explicit: `searchParams` is a request-time API and _opts the page into
-dynamic rendering_. That contradicts "every page statically rendered at build time".
-Alternative that preserves the whole intent (URL owns state, shareable, zero client JS):
-path segments — `app/label/[slug]/page.tsx` + `generateStaticParams()`, one prerendered HTML
-file per label. Tradeoff: query params compose for multiple simultaneous filters, path
-segments don't. **Not yet decided.**
+**M4 — `searchParams` vs path routing. THE decision for this milestone.**
+`searchParams` is a request-time API that opts a page into dynamic rendering, which
+contradicts the static-rendering constraint. `layout.tsx` also never receives `searchParams`,
+and layouts don't re-render on navigation — so the sidebar (which lives in the layout) can't
+react to a query string at all. Intended resolution: path segments
+(`app/label/[slug]/page.tsx` + `generateStaticParams()`), one prerendered file per label.
+Tradeoff: query params compose for multiple simultaneous filters; path segments don't.
+Third option: `cacheComponents: true` (PPR). **Not yet decided — decide at M4.**
 
-**M4 — sidebar active-label highlight.** `layout.tsx` receives `params` but **never**
-`searchParams`, and layouts don't re-render on navigation. The sidebar lives in the layout
-and needs to know the active label. Options all cost something (`useSelectedLayoutSegment`
-in a small client component, or restructuring). **Not yet decided.**
+**M4 — sidebar active-label highlight.** Same root cause as above. Options: a small client
+component using `useSelectedLayoutSegment`, or restructuring. **Not yet decided.**
 
 **Unscheduled — right-edge app-switcher rail.** Real Gmail has a slim vertical icon strip on
-the far right (Calendar, Keep, Contacts). Contacts→About Me is Tier 1, so this is structural,
-not decorative. Discussed, deliberately deferred until we know which icons it needs.
+the far right (Calendar, Keep, Contacts). Contacts→About Me is Tier 1, so this is structural.
+Deferred until we know which icons it needs.
 
-**Mobile drawer slide animation — needs real-browser check.** The toggle logic works
-(open/close state + class flip verified). The slide _animation_ could not be verified in the
-automation browser: it doesn't composite frames (screenshots also fail), and CSS transitions
-are driven by the paint loop, so any transition freezes at its start value there. The idiomatic
-code (`translate-x-0`/`-translate-x-full` + `transition-transform`) is almost certainly correct;
-confirm the slide in a real browser at M5. If it genuinely doesn't slide, fall back to a
-@keyframes animation or accept a snap (remove `transition-transform`).
+**Mobile drawer slide animation — needs real-browser check.** Toggle logic verified; the
+_animation_ can't be verified in the automation browser (it doesn't composite frames, so CSS
+transitions freeze at their start value). Confirm in a real browser at M5.
 
-**Inbox-list polish (fold into M3 verification):**
+**Sender voice.** `sender` mixes "who" (Client Work) and "what" (Personal Project). A voice
+decision, not a bug.
 
-- `sender` mixes "who" (Client Work) and "what" (Personal Project) — voice decision, not a bug
-- Subject + snippet both `flex-1` split 50/50; real Gmail weights them differently
+**Checkboxes are decorative.** Row and select-all checkboxes are real, keyboard-accessible
+`<input type="checkbox">` elements, but nothing is wired to selection yet.
 
-**Before deploy:**
+---
 
-- `metadata.description` in `app/layout.tsx` still says "Generated by create next app"
-- Topbar wordmark currently reads "Gmail" — kickoff forbids Google branding, needs own mark
-- `--gmail-blue-dark` / `--gmail-selected-dark` in `:root` are light-mode-only helper tokens
-  with no dark counterpart; naming should be made consistent when they're first used
+## Debt to clear before the M5 deploy
 
-**Consent gates (do not ship without confirming these conversations happened):**
+- **Topbar wordmark reads "Gmail"** — trademark exposure; needs the user's own mark.
+- **30 of 31 emails are fabricated filler.** Only `server-setup-template` has a written body,
+  and it's realistic dummy prose the user intends to rewrite.
+- **`metadata.description`** still says "Generated by create next app".
+- **Print button** in the reading toolbar isn't wired — it's the resume download.
+- **Reading view sender email** is hardcoded `portfolio@thakursaad.dev`.
+
+## Consent gates (do not ship without confirming these conversations happened)
 
 - Trash easter eggs quoting family/friends — exact wording OK'd, or rewritten as own memory
 - Named references — colleagues must agree before appearing, even name-only
+
+## Features the user wants later (from `docs/others/notes.md`)
+
+- Gmail's unread behaviour: "new" badge on first visit, bold until opened; per-folder unread
+  counts in the sidebar (counts are currently rendered from real data already).
+- Project categories by role: backend built, backend collaborated, project lead, project manager.
 
 ---
 
 ## How to work on this
 
-From the kickoff, unchanged: **explain the concept → show a ≤15-line snippet → say which file →
-stop and wait for the user to write it → then review bluntly.** Do not write application code
-into files unless asked. Shell commands, reads, builds, linters, doc lookups are all free.
+**Explain briefly → show a ≤15-line snippet → say which file → stop and wait → then review
+bluntly.** Do not write application code into files unless asked — but "you decide" /
+"proceed" / "fix what needs fixing" _is_ that permission. **The user commits manually; don't
+commit unless asked.** Keep explanations short and plain; expand only when asked "why".
 
-One step at a time. Check current docs before running CLI commands — versions drift.
+Shell commands, reads, builds, linters, doc lookups are all free. Check current docs before
+running CLI commands or teaching an API — versions drift.
