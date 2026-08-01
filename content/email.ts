@@ -11,7 +11,56 @@ export const emails: Email[] = [
     labels: ["typescript", "node", "express", "mongodb"],
     starred: true,
     read: false,
-    body: [{ type: "paragraph", text: "Placeholder — full case study in M3." }],
+    body: [
+      {
+        type: "paragraph",
+        text: "Every new backend project started the same way: two days of copying auth, error handling, logging, and validation out of the last repo before writing a single line of real feature code. This template is that setup, done once and done right — clone it and you have a production-shaped Express API in minutes instead of days.",
+      },
+      {
+        type: "callout",
+        icon: "⚡",
+        text: "Cuts new-project bootstrap from ~2 days to under 10 minutes, with auth, validation, and structured error handling already wired.",
+      },
+      {
+        type: "paragraph",
+        text: "The core design goal was a single, predictable request lifecycle. Every route flows through the same validate → handle → respond → catch pipeline, so a new endpoint is just a schema and a handler — the plumbing is already there. Errors never crash the process; they funnel into one global handler that returns a consistent JSON shape the frontend can always rely on.",
+      },
+      {
+        type: "code",
+        language: "typescript",
+        code: `// Every route is wrapped once — no try/catch in handlers\nexport const catchAsync =\n  (fn: RequestHandler): RequestHandler =>\n  (req, res, next) =>\n    Promise.resolve(fn(req, res, next)).catch(next);\n\nrouter.post(\n  "/login",\n  validate(loginSchema), // Zod — rejects bad input before the handler runs\n  catchAsync(authController.login),\n);`,
+      },
+      {
+        type: "paragraph",
+        text: "Validation is handled by Zod at the edge of every write endpoint, so handlers can trust their inputs completely — no defensive checks, no unknown shapes. The same schemas are exported for the frontend to reuse, keeping the contract in one place.",
+      },
+      {
+        type: "image",
+        src: "/hello.jpg",
+        alt: "Diagram of the request lifecycle: validate, handle, respond, global error handler",
+        width: 1200,
+        height: 630,
+      },
+      {
+        type: "paragraph",
+        text: "Auth uses short-lived access tokens with refresh rotation, bcrypt-hashed passwords, and a role check that collapses to a single middleware. Winston handles structured logging with daily rotation and a request-id on every line, so tracing a failing request across the logs is trivial.",
+      },
+      {
+        type: "quote",
+        text: "I forked this for a client project and shipped the first working endpoint the same afternoon. The error contract alone saved us a week of frontend guesswork.",
+        attribution: "A developer who used the template",
+      },
+      {
+        type: "paragraph",
+        text: "It ships with Docker, a CI workflow, and an in-memory MongoDB test harness, so the tests run anywhere without a live database. The whole thing is deliberately boring — boring is what you want in the layer everything else is built on.",
+      },
+      {
+        type: "attachment",
+        filename: "server-setup-template.zip",
+        href: "#",
+        size: "48 KB",
+      },
+    ],
   },
   {
     "id": "react-admin-dashboard",
