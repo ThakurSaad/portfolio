@@ -82,12 +82,21 @@ export type Label =
   | "websockets"
   | "yaml";
 
+/**
+ * ISO calendar date, e.g. "2026-07-20".
+ *
+ * A template literal type, not just `string` — so a display value like
+ * "Jul 15" is a compile error. ISO also sorts correctly as plain text,
+ * which is what lets the inbox sort without parsing anything.
+ */
+export type IsoDate = `${number}-${number}-${number}`;
+
 export type Email = {
   id: string;
   sender: string; // company or context
   subject: string; // project title
   snippet: string; // one-line preview
-  date: string; // display date like "Jul 15"
+  date: IsoDate; // ISO — formatted for display at render time
   labels: Label[];
   starred: boolean;
   read: boolean;
