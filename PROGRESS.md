@@ -3,7 +3,7 @@
 Living status doc. The brief lives in `docs/instructions/kickoff-prompt.md`
 (revision 2) and `docs/instructions/concept.md`. This file tracks _where we are_.
 
-**Last updated:** 2026-08-01 — M3 done + full Gmail design pass. **M4 is next.**
+**Last updated:** 2026-08-02 — **M4 in progress** (label data layer done; route next).
 
 ---
 
@@ -33,7 +33,15 @@ Quality gates: `pnpm typecheck`, `pnpm lint`, `pnpm build` — all pass.
 - [x] **M3** — reading view: `[slug]` route + `generateStaticParams`, block renderer
       with exhaustiveness check, reading-view header, signature, one written case study
 - [x] **Design pass** — full Gmail-fidelity refactor (see below)
-- [ ] **M4** — labels → URL-based filtering ← **NEXT**
+- [~] **M4** — labels → URL-based filtering ← **IN PROGRESS**
+  - [x] Decision: **path segments** `/label/[label]`, not `searchParams` (see plan.md Part 0)
+  - [x] Label set: union narrowed **74 → 15** MERN labels; 31 emails **remapped** onto them
+        (all kept; each label now has 2–4 emails so filtering is demonstrable)
+  - [x] `lib/labels.ts` — `LABEL_SLUGS` (Record-guaranteed), `slugToLabel`, `labelsInUse`, `emailsByLabel`
+  - [ ] Route `app/(inbox)/label/[label]/page.tsx` + `generateStaticParams` ← **NEXT**
+  - [ ] Extract shared `components/inbox/email-list.tsx`
+  - [ ] `nav-row.tsx` (client #3) for active-state; rewire sidebar; populate Labels section
+  - [ ] Label chips on the reading view become `<Link>`s
 - [ ] **M5** — responsive, a11y, SEO, deploy to Vercel
 - [ ] **M6** — remaining Tier 1 content → frontend complete
 - [ ] M7 compose→backend · M8 chat · M9 owner inbox _(no backend work before M7)_
@@ -72,13 +80,18 @@ components/
   email/signature.tsx               reusable sign-off
   ui/button.tsx                     shadcn, untouched
 content/
-  types.ts                          Block, Label, IsoDate, Email
-  email.ts                          31 emails (1 written, 30 filler)
+  types.ts                          Block, Label (15 members), IsoDate, Email
+  email.ts                          31 emails (1 written, 30 filler), ISO dates, remapped to 15 labels
 lib/
   emails.ts                         sortedEmails + formatEmailDate
+  labels.ts                         LABEL_SLUGS, slugToLabel, labelsInUse, emailsByLabel
   utils.ts                          shadcn cn()
 public/hello.jpg                    case-study image
 ```
+
+> Note: `content/email.ts` is still singular; plan.md wants it renamed to `emails.ts`
+> during the content pass. Not renamed yet — `lib/emails.ts` (the helper) already exists
+> and is a different file.
 
 ---
 
@@ -110,21 +123,27 @@ into a smeared fake bold. Gmail uses 500 for unread — use `font-medium`.
 **One semantic `--gmail-accent` token** replaces the old `--gmail-blue` / `--gmail-blue-dark`
 pair, so components never need a `dark:` variant for the accent colour.
 
+**Label set: remapped, not culled.** The union had 74 labels, 59 used exactly once — which
+would mean 59 single-email routes and a 72-row sidebar. Instead of deleting emails (which
+would empty the inbox mid-build), the union was narrowed to **15 real MERN labels** and the
+31 emails reassigned onto them, so each label owns 2–4 emails and filtering is demonstrable.
+`lib/labels.ts` owns label↔slug conversion; `Record<Label, string>` makes a label without a
+URL slug a compile error (verified: it refused to build while the union still had 74 members).
+
 ---
 
 ## Open questions / deferred
 
-**M4 — `searchParams` vs path routing. THE decision for this milestone.**
-`searchParams` is a request-time API that opts a page into dynamic rendering, which
-contradicts the static-rendering constraint. `layout.tsx` also never receives `searchParams`,
-and layouts don't re-render on navigation — so the sidebar (which lives in the layout) can't
-react to a query string at all. Intended resolution: path segments
-(`app/label/[slug]/page.tsx` + `generateStaticParams()`), one prerendered file per label.
-Tradeoff: query params compose for multiple simultaneous filters; path segments don't.
-Third option: `cacheComponents: true` (PPR). **Not yet decided — decide at M4.**
+**M4 — `searchParams` vs path routing. ✅ DECIDED: path segments.**
+`/label/[label]` + `generateStaticParams()` + `dynamicParams = false`, one prerendered file
+per label. Rejected `searchParams` (forces dynamic rendering) and `cacheComponents`/PPR (no
+dynamic hole to justify it). Full reasoning in `plan.md` Part 0. Escape hatch if multi-filter
+is ever needed: build `/search` as the one deliberately-dynamic route.
 
-**M4 — sidebar active-label highlight.** Same root cause as above. Options: a small client
-component using `useSelectedLayoutSegment`, or restructuring. **Not yet decided.**
+**M4 — sidebar active-label highlight. ✅ DECIDED: one client island (`nav-row.tsx`, #3).**
+Uses `usePathname()`. Must be client because the cached layout never sees the pathname, and
+CSS can't set `aria-current="page"` (an attribute). Receives the server-rendered icon as
+`children`, so lucide-react never enters the client bundle. Not built yet.
 
 **Unscheduled — right-edge app-switcher rail.** Real Gmail has a slim vertical icon strip on
 the far right (Calendar, Keep, Contacts). Contacts→About Me is Tier 1, so this is structural.
