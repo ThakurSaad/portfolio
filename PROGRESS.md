@@ -3,7 +3,7 @@
 Living status doc. The brief lives in `docs/instructions/kickoff-prompt.md`
 (revision 2) and `docs/instructions/concept.md`. This file tracks _where we are_.
 
-**Last updated:** 2026-08-02 — **M4 in progress** (label data layer done; route next).
+**Last updated:** 2026-08-12 — **M4 in progress** (label route built; extracting shared email list next).
 
 ---
 
@@ -38,8 +38,8 @@ Quality gates: `pnpm typecheck`, `pnpm lint`, `pnpm build` — all pass.
   - [x] Label set: union narrowed **74 → 15** MERN labels; 31 emails **remapped** onto them
         (all kept; each label now has 2–4 emails so filtering is demonstrable)
   - [x] `lib/labels.ts` — `LABEL_SLUGS` (Record-guaranteed), `slugToLabel`, `labelsInUse`, `emailsByLabel`
-  - [ ] Route `app/(inbox)/label/[label]/page.tsx` + `generateStaticParams` ← **NEXT**
-  - [ ] Extract shared `components/inbox/email-list.tsx`
+  - [x] Route `app/(inbox)/label/[label]/page.tsx` + `generateStaticParams` (15 routes, SSG verified)
+  - [ ] Extract shared `components/inbox/email-list.tsx` ← **NEXT**
   - [ ] `nav-row.tsx` (client #3) for active-state; rewire sidebar; populate Labels section
   - [ ] Label chips on the reading view become `<Link>`s
 - [ ] **M5** — responsive, a11y, SEO, deploy to Vercel
