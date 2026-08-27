@@ -2,7 +2,7 @@
   "name": "portfolio",
   "version": "0.1.0",
   "author": "Thakur Saad",
-  "description": "A portfolio website built with Next.js, Tailwind CSS, Typescript, and Shadcn UI.",
+  "description": "A portfolio website built with Next.js & Typescript.",
   "private": true,
   "scripts": {
     "dev": "next dev",
