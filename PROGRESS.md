@@ -3,7 +3,7 @@
 Living status doc. The brief lives in `docs/instructions/kickoff-prompt.md`
 (revision 2) and `docs/instructions/concept.md`. This file tracks _where we are_.
 
-**Last updated:** 2026-08-12 — **M4 in progress** (label route built; extracting shared email list next).
+**Last updated:** 2026-08-30 — **M4 done.** Labels ship as prerendered path segments; M5 is next.
 
 ---
 
@@ -20,7 +20,8 @@ Living status doc. The brief lives in `docs/instructions/kickoff-prompt.md`
 | Fonts           | Inter (chrome) + Roboto 400/500 + Roboto Mono, via `next/font/google` |
 
 Quality gates: `pnpm typecheck`, `pnpm lint`, `pnpm build` — all pass.
-`/` and `/_not-found` prerender `○ (Static)`; `/email/[slug]` prerenders 31 pages `● (SSG)`.
+`/` and `/_not-found` prerender `○ (Static)`; `/email/[slug]` prerenders 31 pages and
+`/label/[label]` prerenders 15, both `● (SSG)`. **50 static pages, zero dynamic routes.**
 
 ---
 
@@ -33,7 +34,7 @@ Quality gates: `pnpm typecheck`, `pnpm lint`, `pnpm build` — all pass.
 - [x] **M3** — reading view: `[slug]` route + `generateStaticParams`, block renderer
       with exhaustiveness check, reading-view header, signature, one written case study
 - [x] **Design pass** — full Gmail-fidelity refactor (see below)
-- [~] **M4** — labels → URL-based filtering ← **IN PROGRESS**
+- [x] **M4** — labels → URL-based filtering
   - [x] Decision: **path segments** `/label/[label]`, not `searchParams` (see plan.md Part 0)
   - [x] Label set: union narrowed **74 → 15** MERN labels; 31 emails **remapped** onto them
         (all kept; each label now has 2–4 emails so filtering is demonstrable)
@@ -41,8 +42,8 @@ Quality gates: `pnpm typecheck`, `pnpm lint`, `pnpm build` — all pass.
   - [x] Route `app/(inbox)/label/[label]/page.tsx` + `generateStaticParams` (15 routes, SSG verified)
   - [x] Extract shared `components/inbox/email-list.tsx` — both pages use it
   - [x] `nav-row.tsx` (client #3) for active-state; sidebar rewired; Labels section populated
-  - [ ] Label chips on the reading view become `<Link>`s ← **NEXT**
-- [ ] **M5** — responsive, a11y, SEO, deploy to Vercel
+  - [x] Label chips on the reading view are `<Link>`s to `/label/[label]`
+- [ ] **M5** — responsive, a11y, SEO, deploy to Vercel ← **NEXT**
 - [ ] **M6** — remaining Tier 1 content → frontend complete
 - [ ] M7 compose→backend · M8 chat · M9 owner inbox _(no backend work before M7)_
 
@@ -51,6 +52,10 @@ Quality gates: `pnpm typecheck`, `pnpm lint`, `pnpm build` — all pass.
 1. `components/theme-toggle.tsx` — needs `onClick`; holds zero state.
 2. `components/layout/mobile-sidebar-toggle.tsx` — holds `open` boolean; receives the
    server-rendered `<Sidebar/>` as children (correct island pattern).
+3. `components/layout/nav-row.tsx` — needs `usePathname()` for the active highlight; the
+   cached layout never sees the pathname, and CSS cannot set `aria-current` (an attribute).
+   Holds zero state; receives its lucide icon as `children`, so no icon code reaches the
+   client bundle.
 
 Everything else — inbox tabs, toolbars, checkboxes, hover states — is a Server Component.
 Tabs are links, checkboxes are native inputs, hover is pure CSS.
@@ -67,13 +72,16 @@ app/
     layout.tsx                      full-width topbar, then sidebar + white card <main>
     page.tsx                        toolbar + tabs + sorted row list
     email/[slug]/page.tsx           reading view; generateStaticParams, dynamicParams=false
+    label/[label]/page.tsx          label filter; 15 SSG routes, dynamicParams=false
 components/
-  layout/sidebar.tsx                Compose, nav rows (32px pills), unread counts
+  layout/sidebar.tsx                Compose, nav rows (32px pills), unread counts, Labels
   layout/topbar.tsx                 hamburger, wordmark, search form, apps grid, avatar
   layout/mobile-sidebar-toggle.tsx  client #2
+  layout/nav-row.tsx                client #3 — usePathname() active state + aria-current
   theme-toggle.tsx                  client #1
   inbox/inbox-tabs.tsx              Primary / Promotions / Social
   inbox/list-toolbar.tsx            select-all, refresh, pagination
+  inbox/email-list.tsx              shared <ul> of rows — inbox and label pages both use it
   inbox/email-row.tsx               checkbox, star, sender, subject+snippet, <time>
   email/block-renderer.tsx          discriminated-union switch + never check
   email/reading-toolbar.tsx         back, archive, delete, …, print
@@ -130,6 +138,17 @@ would empty the inbox mid-build), the union was narrowed to **15 real MERN label
 `lib/labels.ts` owns label↔slug conversion; `Record<Label, string>` makes a label without a
 URL slug a compile error (verified: it refused to build while the union still had 74 members).
 
+**`strict` does not catch a wrong-import that shares a prop.** The label chips were briefly
+importing `Link` from **lucide-react** (the chain-link _icon_) instead of `next/link`. It
+typechecked clean — lucide's props extend `SVGProps`, and SVG has an `href` attribute — so the
+chips rendered as `<svg href="...">` and simply didn't navigate. Lesson: when a wrong import
+still compiles, the two things share a structural prop; the compiler can't help, only clicking
+it can.
+
+**Narrow with `notFound()`, not `!`.** `slugToLabel()` returns `Label | undefined`. Because
+`notFound()` returns `never`, `if (!label) notFound();` narrows the type for real, where the
+non-null assertion only silenced it. Same pattern as the email page.
+
 ---
 
 ## Open questions / deferred
@@ -143,7 +162,7 @@ is ever needed: build `/search` as the one deliberately-dynamic route.
 **M4 — sidebar active-label highlight. ✅ DECIDED: one client island (`nav-row.tsx`, #3).**
 Uses `usePathname()`. Must be client because the cached layout never sees the pathname, and
 CSS can't set `aria-current="page"` (an attribute). Receives the server-rendered icon as
-`children`, so lucide-react never enters the client bundle. Not built yet.
+`children`, so lucide-react never enters the client bundle. **Built and shipped.**
 
 **Unscheduled — right-edge app-switcher rail.** Real Gmail has a slim vertical icon strip on
 the far right (Calendar, Keep, Contacts). Contacts→About Me is Tier 1, so this is structural.

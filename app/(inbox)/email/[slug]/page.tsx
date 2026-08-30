@@ -4,7 +4,8 @@ import { BlockContent } from "@/components/email/block-renderer";
 import { Signature } from "@/components/email/signature";
 import ReadingToolbar from "@/components/email/reading-toolbar";
 import { formatEmailDate } from "@/lib/emails";
-import { Star, Reply, MoreVertical, Forward, Link } from "lucide-react";
+import { Star, Reply, MoreVertical, Forward } from "lucide-react";
+import Link from "next/link";
 import { LABEL_SLUGS } from "@/lib/labels";
 
 export const dynamicParams = false;
