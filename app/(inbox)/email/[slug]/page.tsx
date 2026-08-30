@@ -4,7 +4,8 @@ import { BlockContent } from "@/components/email/block-renderer";
 import { Signature } from "@/components/email/signature";
 import ReadingToolbar from "@/components/email/reading-toolbar";
 import { formatEmailDate } from "@/lib/emails";
-import { Star, Reply, MoreVertical, Forward } from "lucide-react";
+import { Star, Reply, MoreVertical, Forward, Link } from "lucide-react";
+import { LABEL_SLUGS } from "@/lib/labels";
 
 export const dynamicParams = false;
 
@@ -32,12 +33,15 @@ export default async function EmailPage({
           </h1>
           <span className="flex items-center gap-2 shrink-0 pt-1">
             {email.labels.map((label) => (
-              <span
+              <Link
                 key={label}
-                className="hidden md:inline text-xs px-2 py-0.5 rounded bg-[var(--gmail-sidebar-hover)] text-muted-foreground"
+                href={`/label/${LABEL_SLUGS[label]}`}
+                className="hidden md:inline text-xs px-2 py-0.5 rounded 
+                bg-[var(--gmail-sidebar-hover)] text-muted-foreground hover:bg-[var(--gmail-accent)] 
+                hover:text-white transition-colors"
               >
                 {label}
-              </span>
+              </Link>
             ))}
           </span>
         </header>
