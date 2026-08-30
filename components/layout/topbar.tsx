@@ -14,13 +14,13 @@ export default function Topbar({ hamburger }: { hamburger?: React.ReactNode }) {
         >
           <Menu size={20} />
         </button>
-        <span className="text-[22px] font-medium text-[var(--gmail-accent)] ml-1 tracking-tight">
+        <span className="hidden sm:inline font-medium text-[var(--gmail-accent)] ml-1 tracking-tight">
           Gmail
         </span>
       </div>
 
       {/* Search — a plain GET form, so filtering needs zero client JS */}
-      <form method="get" action="/" className="flex-1 max-w-[720px]">
+      <form method="get" action="/" className="flex-1 min-w-0 max-w-[720px]">
         <label htmlFor="search" className="sr-only">
           Search portfolio
         </label>
