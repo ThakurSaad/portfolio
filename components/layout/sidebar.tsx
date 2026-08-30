@@ -1,4 +1,4 @@
-﻿import {
+import {
   PencilLine,
   Inbox,
   Star,

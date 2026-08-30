@@ -1,4 +1,4 @@
-﻿import EmailList from "@/components/inbox/email-list";
+import EmailList from "@/components/inbox/email-list";
 import InboxTabs from "@/components/inbox/inbox-tabs";
 import ListToolbar from "@/components/inbox/list-toolbar";
 import { sortedEmails } from "@/lib/emails";
