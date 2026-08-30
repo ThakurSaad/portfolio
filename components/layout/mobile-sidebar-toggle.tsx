@@ -15,6 +15,7 @@ export default function MobileSidebarToggle({
       {/* Hamburger button — lives in the topbar */}
       <button
         onClick={() => setOpen(true)}
+        aria-label="Open main menu"
         className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[var(--gmail-sidebar-hover)] md:hidden"
       >
         <Menu size={20} />
@@ -23,6 +24,7 @@ export default function MobileSidebarToggle({
       {/* Overlay + sidebar drawer — only visible when open */}
 
       <div
+        inert={!open}
         className={`fixed inset-0 z-50 md:hidden transition-colors duration-300
           ${open ? "bg-[rgba(0,0,0,0.5)]" : "bg-transparent pointer-events-none"}`}
         onClick={() => setOpen(false)}

@@ -1,4 +1,4 @@
-import {
+﻿import {
   PencilLine,
   Inbox,
   Star,
@@ -34,7 +34,7 @@ export default function Sidebar() {
         </button>
       </div>
 
-      <nav className="mt-1">
+      <nav aria-label="Main" className="mt-1">
         {navItems.map(({ label, href, icon: Icon }) => {
           const count =
             label === "Inbox"
