@@ -40,13 +40,13 @@ Quality gates: `pnpm typecheck`, `pnpm lint`, `pnpm build` — all pass.
   - [x] `lib/labels.ts` — `LABEL_SLUGS` (Record-guaranteed), `slugToLabel`, `labelsInUse`, `emailsByLabel`
   - [x] Route `app/(inbox)/label/[label]/page.tsx` + `generateStaticParams` (15 routes, SSG verified)
   - [x] Extract shared `components/inbox/email-list.tsx` — both pages use it
-  - [ ] `nav-row.tsx` (client #3) for active-state; rewire sidebar; populate Labels section ← **NEXT**
-  - [ ] Label chips on the reading view become `<Link>`s
+  - [x] `nav-row.tsx` (client #3) for active-state; sidebar rewired; Labels section populated
+  - [ ] Label chips on the reading view become `<Link>`s ← **NEXT**
 - [ ] **M5** — responsive, a11y, SEO, deploy to Vercel
 - [ ] **M6** — remaining Tier 1 content → frontend complete
 - [ ] M7 compose→backend · M8 chat · M9 owner inbox _(no backend work before M7)_
 
-## Client component budget: **2 of 8 used**
+## Client component budget: **3 of 8 used**
 
 1. `components/theme-toggle.tsx` — needs `onClick`; holds zero state.
 2. `components/layout/mobile-sidebar-toggle.tsx` — holds `open` boolean; receives the
