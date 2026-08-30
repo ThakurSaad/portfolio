@@ -7,11 +7,33 @@ import { formatEmailDate } from "@/lib/emails";
 import { Star, Reply, MoreVertical, Forward } from "lucide-react";
 import Link from "next/link";
 import { LABEL_SLUGS } from "@/lib/labels";
+import type { Metadata } from "next";
 
 export const dynamicParams = false;
 
 export function generateStaticParams() {
   return emails.map((email) => ({ slug: email.id }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const email = emails.find((e) => e.id === slug);
+  if (!email) return {};
+
+  return {
+    title: email.subject,
+    description: email.snippet,
+    alternates: { canonical: `/email/${slug}` },
+    openGraph: {
+      type: "article",
+      title: email.subject,
+      description: email.snippet,
+    },
+  };
 }
 
 export default async function EmailPage({
