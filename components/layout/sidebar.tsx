@@ -15,7 +15,7 @@ import { LABEL_SLUGS, labelsInUse } from "@/lib/labels";
 const navItems = [
   { label: "Inbox", href: "/", icon: Inbox },
   { label: "Starred", href: "#", icon: Star },
-  { label: "Important", href: "/important", icon: AlertCircle },
+  { label: "Important", href: "#", icon: AlertCircle },
   { label: "Sent", href: "#", icon: Send },
   { label: "Drafts", href: "#", icon: FileText },
 ];
